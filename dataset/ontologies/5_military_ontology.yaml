@@ -1,0 +1,135 @@
+id: https://w3id.org/ontogpt/military
+name: military
+title: Military Ontology
+description: >-
+  A schema for extracting military-related information as subject-predicate-object
+  triples. The triple predicates use the Wikidata properties defined in the
+  original military ontology.
+license: https://creativecommons.org/publicdomain/zero/1.0/
+
+prefixes:
+  linkml: https://w3id.org/linkml/
+  military: https://w3id.org/ontogpt/military/
+  wd: http://www.wikidata.org/entity/
+  wdt: http://www.wikidata.org/prop/direct/
+
+default_prefix: military
+default_range: string
+
+imports:
+  - linkml:types
+  - core
+
+enums:
+  DefinedPredicates:
+    description: >-
+      The only permitted relationship predicates for military knowledge graph
+      extraction. These values are a complete and exclusive set of allowed predicates. Only take predicates from these permissible values,
+      and do not invent or use a synonym for these predicates. Use the exact spelling that this list of predicates define.
+    permissible_values:
+      military_rank:
+        description: The military rank held by the person. The subject must be an instance of the class human. The object must be an instance of the class military rank.
+        meaning: wdt:P410
+
+      military_branch:
+        description: The military branch or unit in which the person serves. The subject must be an instance of the class human. The object must be an instance of the class military unit.
+        meaning: wdt:P241
+
+      military_casualty_classification:
+        description: The military casualty classification of the person. The subject must be an instance of the class human. The object must be an instance of the class military casualty classification.
+        meaning: wdt:P1347
+
+      designed_by:
+        description: The organisation that designed the military equipment or vehicle. The subject must be an instance of the class military equipment or an instance of the class military vehicle. The object must be an instance of the class organization.
+        meaning: wdt:P287
+
+      commanded_by:
+        description: The person who commanded the command. The subject must be an instance of the class command. The object must be an instance of the class human.
+        meaning: wdt:P4791
+
+      next_higher_rank:
+        description: The rank immediately above the military rank. The subject must be an instance of the class military rank. The object must be an instance of the class rank.
+        meaning: wdt:P3730
+
+      designated_as_terrorist_by:
+        description: The country that designated the armed organisation as terrorist. The subject must be an instance of the class armed organization. The object must be an instance of the class country.
+        meaning: wdt:P3461
+
+      wing_configuration:
+        description: The wing configuration of the aircraft. The subject must be an entity of class Q11436 (class label not specified in the source ontology).
+        meaning: wdt:P1654
+
+classes:
+  KnowledgeGraph:
+    tree_root: true
+    description: >-
+      The root extraction object. Contains a collection of subject-predicate-
+      object triples describing military-related entities and facts.
+    attributes:
+      triples:
+        range: Triple
+        multivalued: true
+        description: >-
+            Extract every relationship explicitly mentioned in the input text that can be represented using the permitted ontology predicates.
+            The only permitted predicates and their definitions are:
+
+            military_rank: The military rank held by the person. The subject must be an instance of the class human. The object must be an instance of the class military rank.
+            military_branch: The military branch or unit in which the person serves. The subject must be an instance of the class human. The object must be an instance of the class military unit.
+            military_casualty_classification: The military casualty classification of the person. The subject must be an instance of the class human. The object must be an instance of the class military casualty classification.
+            designed_by: The organisation that designed the military equipment or vehicle. The subject must be an instance of the class military equipment or an instance of the class military vehicle. The object must be an instance of the class organization.
+            commanded_by: The person who commanded the command. The subject must be an instance of the class command. The object must be an instance of the class human.
+            next_higher_rank: The rank immediately above the military rank. The subject must be an instance of the class military rank. The object must be an instance of the class rank.
+            designated_as_terrorist_by: The country that designated the armed organisation as terrorist. The subject must be an instance of the class armed organization. The object must be an instance of the class country.
+            wing_configuration: The wing configuration of the aircraft. The subject must be an entity of class Q11436 (class label not specified in the source ontology).
+
+            Select predicates according to their definitions. Use the exact spelling of the permitted predicate names. Do not
+            invent predicates or use alternative predicate names. Do not include relationships that cannot be represented using the permitted
+            predicates.
+
+            Each triple must contain exactly one subject, one predicate, and one object, in that order. Within each triple, separate the subject, predicate,
+            and object using commas. Separate distinct triples using semicolons.
+            
+            Extract a separate triple for each distinct object associated with the same subject and predicate.
+
+            Do not invent entities, relationships, or values that are not supported by the input text.
+
+  Triple:
+    description: >-
+      A single subject-predicate-object statement extracted from the input text.
+      The subject identifies the entity being described, the predicate identifies
+      the relationship or property, and the object provides the related entity
+      or literal value. Each triple must be in the format of subject, predicate, object, where each item is separated by commas.
+    attributes:
+      subject:
+        description: >-
+          The subject of the triple. Preserve the subject supplied
+          in the input triple exactly as provided. Do not replace,
+          reinterpret, infer, expand, or resolve the subject using
+          external knowledge. Do not introduce an entity name that
+          is absent from the supplied input triple.
+        range: string
+        required: true
+
+      predicate:
+        description: >-
+          The relationship or property connecting the subject and object.
+          Preserve the predicate supplied in the input triple exactly as
+          provided. Do not reinterpret, normalise, correct, or substitute
+          the predicate with another relationship.
+          The permitted predicates are defined in the DefinedPredicates enum.
+          If the supplied predicate is not permitted, return the original
+          predicate unchanged so that it can be rejected during validation.
+          Return only the predicate value. Do not provide explanations,
+          notes, warnings, suggested corrections, or alternative predicates.
+        range: DefinedPredicates
+        required: true
+
+      object:
+        description: >-
+          The object of the triple. This is the entity, concept, date, or
+          literal value associated with the subject through the predicate.
+          Return the extracted value as text. Do not combine multiple entities
+          into a single object. Create a separate triple for each distinct
+          object associated with the same subject and predicate.
+        range: string
+        required: true

@@ -1,0 +1,170 @@
+id: https://w3id.org/ontogpt/movie
+name: movie
+title: Movie Ontology
+description: >-
+  A schema for extracting film-related information as subject-predicate-object
+  triples. The triple predicates use the Wikidata properties defined in the
+  original movie ontology.
+license: https://creativecommons.org/publicdomain/zero/1.0/
+
+prefixes:
+  linkml: https://w3id.org/linkml/
+  movie: https://w3id.org/ontogpt/movie/
+  wd: http://www.wikidata.org/entity/
+  wdt: http://www.wikidata.org/prop/direct/
+
+default_prefix: movie
+default_range: string
+
+imports:
+  - linkml:types
+  - core
+
+enums:
+  DefinedPredicates:
+    description: >-
+      The only permitted relationship predicates for movie knowledge graph
+      extraction. These values are a complete and exclusive set of allowed predicates. Only take predicates from these permissible values,
+      and do not invent or use a synonym for these predicates. Use the exact spelling that this list of predicates define.
+    permissible_values:
+      director:
+        description: The director of the film. The subject must be a film. The object must be a human.
+        meaning: wdt:P57
+
+      screenwriter:
+        description: The screenwriter of the film. The subject must be a film. The object must be a human.
+        meaning: wdt:P58
+
+      genre:
+        description: The genre of the film, defining what kind of film or the category of the film, such as horror or sci-fi. The subject must be a film. The object must be a genre.
+        meaning: wdt:P136
+
+      based_on:
+        description: A work on which the film is based. The subject must be a film. The object must be a written work.
+        meaning: wdt:P144
+
+      cast_member:
+        description: An actor or cast member appearing in the film. The subject must be a film. The object must be a human.
+        meaning: wdt:P161
+
+      award_received:
+        description: An award received by the film. The subject must be a film. The object must be a award.
+        meaning: wdt:P166
+
+      production_company:
+        description: The production company of the film. The subject must be a film. The object must be a film production company.
+        meaning: wdt:P272
+
+      country_of_origin:
+        description: The country of origin of the film. The subject must be a film. The object must be a country.
+        meaning: wdt:P495
+
+      publication_date:
+        description: The publication or release date of the film. A year used to describe a film, such as "a 2005 film", also represents the publication date. The subject must be a film. The object must be a date or year.
+        meaning: wdt:P577
+
+      characters:
+        description: Fictional characters appearing in the film. The subject must be a film. The object must be a film character.
+        meaning: wdt:P674
+
+      narrative_location:
+        description: The location in which the film's narrative is set. The subject must be a film. The object must be a location.
+        meaning: wdt:P840
+
+      filming_location:
+        description: The location where the film was filmed. The subject must be a film. The object must be a location.
+        meaning: wdt:P915
+
+      main_subject:
+        description: The main subject or topic of the film. The subject must be a film.
+        meaning: wdt:P921
+
+      nominated_for:
+        description: An award for which the film was nominated. The subject must be a film. The object must be a award.
+        meaning: wdt:P1411
+
+      cost:
+        description: The cost or budget associated with the film. The subject must be a film. The object must be a cost or budget value.
+        meaning: wdt:P2130
+
+classes:
+  KnowledgeGraph:
+    tree_root: true
+    description: >-
+      The root extraction object. Contains a collection of subject-predicate-
+      object triples describing a film and its associated entities and facts.
+    attributes:
+      triples:
+        range: Triple
+        multivalued: true
+        description: >-
+            Extract every relationship explicitly mentioned in the input text that can be represented using the permitted ontology predicates.
+            The only permitted predicates and their definitions are:
+
+            director: The director of the film. The subject must be a film. The object must be a human.
+            screenwriter: The screenwriter of the film. The subject must be a film. The object must be a human.
+            genre: The genre, category, or type of film. The subject must be a film. The object must be a genre.
+            based_on: A work on which the film is based. The subject must be a film. The object must be a written work.
+            cast_member: An actor or cast member appearing in the film. The subject must be a film. The object must be a human.
+            award_received: An award received by the film. The subject must be a film. The object must be a award.
+            production_company: A company responsible for producing the film, not an individual producer. The subject must be a film. The object must be a film production company.
+            country_of_origin: The country of origin of the film. The subject must be a film. The object must be a country.
+            publication_date: The publication or release date of the film. The subject must be a film. The object must be a date or year.
+            characters: Fictional characters appearing in the film. The subject must be a film. The object must be a film character.
+            narrative_location: The location in which the film's narrative is set. The subject must be a film. The object must be a location.
+            filming_location: The location where the film was filmed. The subject must be a film. The object must be a location.
+            main_subject: The main subject or topic of the film. The subject must be a film.
+            nominated_for: An award for which the film was nominated. The subject must be a film. The object must be a award.
+            cost: The cost or budget associated with the film. The subject must be a film. The object must be a cost or budget value.
+
+            Select predicates according to their definitions. Use the exact spelling of the permitted predicate names. Do not
+            invent predicates or use alternative predicate names. Do not include relationships that cannot be represented using the permitted
+            predicates.
+
+            Each triple must contain exactly one subject, one predicate, and one object, in that order. Within each triple, separate the subject, predicate,
+            and object using commas. Separate distinct triples using semicolons.
+            
+            Extract a separate triple for each distinct object associated with the same subject and predicate.
+
+            Do not invent entities, relationships, or values that are not supported by the input text.
+
+  Triple:
+    description: >-
+      A single subject-predicate-object statement extracted from the input text.
+      The subject identifies the entity being described, the predicate identifies
+      the relationship or property, and the object provides the related entity
+      or literal value. Each triple must be in the format of subject, predicate, object, where each item is separated by commas.
+    attributes:
+      subject:
+        description: >-
+          The subject of the triple. Preserve the subject supplied
+          in the input triple exactly as provided. Do not replace,
+          reinterpret, infer, expand, or resolve the subject using
+          external knowledge. Do not introduce an entity name that
+          is absent from the supplied input triple.
+        range: string
+        required: true
+
+      predicate:
+        description: >-
+          The relationship or property connecting the subject and object.
+          Preserve the predicate supplied in the input triple exactly as
+          provided. Do not reinterpret, normalise, correct, or substitute
+          the predicate with another relationship.
+          The permitted predicates are defined in the DefinedPredicates enum.
+          If the supplied predicate is not permitted, return the original
+          predicate unchanged so that it can be rejected during validation.
+          Return only the predicate value. Do not provide explanations,
+          notes, warnings, suggested corrections, or alternative predicates.
+        range: DefinedPredicates
+        required: true
+
+      object:
+        description: >-
+          The object of the triple. This is the entity, concept, date, or
+          literal value associated with the subject through the predicate.
+          Return the extracted value as text. Do not combine multiple entities
+          into a single object. Create a separate triple for each distinct
+          object associated with the same subject and predicate.
+        range: string
+        required: true

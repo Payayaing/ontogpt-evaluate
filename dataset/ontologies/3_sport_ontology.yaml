@@ -1,0 +1,145 @@
+id: https://w3id.org/ontogpt/sport
+name: sport
+title: Sports Ontology
+description: >-
+  A schema for extracting sports-related information as subject-predicate-object
+  triples. The triple predicates use the Wikidata properties defined in the
+  original sports ontology.
+license: https://creativecommons.org/publicdomain/zero/1.0/
+
+prefixes:
+  linkml: https://w3id.org/linkml/
+  sport: https://w3id.org/ontogpt/sport/
+  wd: http://www.wikidata.org/entity/
+  wdt: http://www.wikidata.org/prop/direct/
+
+default_prefix: sport
+default_range: string
+
+imports:
+  - linkml:types
+  - core
+
+enums:
+  DefinedPredicates:
+    description: >-
+      The only permitted relationship predicates for sports knowledge graph
+      extraction. These values are a complete and exclusive set of allowed predicates. Only take predicates from these permissible values,
+      and do not invent or use a synonym for these predicates. Use the exact spelling that this list of predicates define.
+    permissible_values:
+      occupation:
+        description: The occupation of the person as an athlete. The subject must be an instance of the class human. The object must be an instance of the class athlete.
+        meaning: wdt:P106
+
+      sport:
+        description: The sport associated with the sports competition. The subject must be an instance of the class sports competition. The object must be an instance of the class sport.
+        meaning: wdt:P641
+
+      member_of_sports_team:
+        description: The sports team or club of which the person is a member. The subject must be an instance of the class human. The object must be an instance of the class sports club.
+        meaning: wdt:P54
+
+      country_for_sport:
+        description: The country represented by the person in sport. The subject must be an instance of the class human. The object must be an instance of the class country.
+        meaning: wdt:P1532
+
+      sports_season_of_league_or_competition:
+        description: The league or competition to which the sports season belongs. The subject must be an instance of the class sports season. The object must be an entity of class Q500834 (class label not specified in the source ontology).
+        meaning: wdt:P3450
+
+      coach_of_sports_team:
+        description: The sports team or club coached by the person. The subject must be an instance of the class human. The object must be an instance of the class sports club.
+        meaning: wdt:P6087
+
+      league:
+        description: The sports league associated with the person. The subject must be an instance of the class human. The object must be an instance of the class professional sports league or an entity of class Q623109 (class label not specified in the source ontology).
+        meaning: wdt:P118
+
+      home_venue:
+        description: The home venue of the sports club. The subject must be an instance of the class sports club. The object must be an entity of class Q23764314 (class label not specified in the source ontology).
+        meaning: wdt:P159
+
+      country_of_origin:
+        description: The country in which the sport originated. The subject must be an instance of the class sport. The object must be an instance of the class country.
+        meaning: wdt:P495
+
+      competition_class:
+        description: The competition class associated with the sports organisation. The subject must be an instance of the class sports organization.
+        meaning: wdt:P2094
+
+classes:
+  KnowledgeGraph:
+    tree_root: true
+    description: >-
+      The root extraction object. Contains a collection of subject-predicate-
+      object triples describing sports-related entities and facts.
+    attributes:
+      triples:
+        range: Triple
+        multivalued: true
+        description: >-
+            Extract every relationship explicitly mentioned in the input text that can be represented using the permitted ontology predicates.
+            The only permitted predicates and their definitions are:
+
+            occupation: The occupation of the person as an athlete. The subject must be an instance of the class human. The object must be an instance of the class athlete.
+            sport: The sport associated with the sports competition. The subject must be an instance of the class sports competition. The object must be an instance of the class sport.
+            member_of_sports_team: The sports team or club of which the person is a member. The subject must be an instance of the class human. The object must be an instance of the class sports club.
+            country_for_sport: The country represented by the person in sport. The subject must be an instance of the class human. The object must be an instance of the class country.
+            sports_season_of_league_or_competition: The league or competition to which the sports season belongs. The subject must be an instance of the class sports season. The object must be an entity of class Q500834 (class label not specified in the source ontology).
+            coach_of_sports_team: The sports team or club coached by the person. The subject must be an instance of the class human. The object must be an instance of the class sports club.
+            league: The sports league associated with the person. The subject must be an instance of the class human. The object must be an instance of the class professional sports league or an entity of class Q623109 (class label not specified in the source ontology).
+            home_venue: The home venue of the sports club. The subject must be an instance of the class sports club. The object must be an entity of class Q23764314 (class label not specified in the source ontology).
+            country_of_origin: The country in which the sport originated. The subject must be an instance of the class sport. The object must be an instance of the class country.
+            competition_class: The competition class associated with the sports organisation. The subject must be an instance of the class sports organization.
+
+            Select predicates according to their definitions. Use the exact spelling of the permitted predicate names. Do not
+            invent predicates or use alternative predicate names. Do not include relationships that cannot be represented using the permitted
+            predicates.
+
+            Each triple must contain exactly one subject, one predicate, and one object, in that order. Within each triple, separate the subject, predicate,
+            and object using commas. Separate distinct triples using semicolons.
+            
+            Extract a separate triple for each distinct object associated with the same subject and predicate.
+
+            Do not invent entities, relationships, or values that are not supported by the input text.
+
+  Triple:
+    description: >-
+      A single subject-predicate-object statement extracted from the input text.
+      The subject identifies the entity being described, the predicate identifies
+      the relationship or property, and the object provides the related entity
+      or literal value. Each triple must be in the format of subject, predicate, object, where each item is separated by commas.
+    attributes:
+      subject:
+        description: >-
+          The subject of the triple. Preserve the subject supplied
+          in the input triple exactly as provided. Do not replace,
+          reinterpret, infer, expand, or resolve the subject using
+          external knowledge. Do not introduce an entity name that
+          is absent from the supplied input triple.
+        range: string
+        required: true
+
+      predicate:
+        description: >-
+          The relationship or property connecting the subject and object.
+          Preserve the predicate supplied in the input triple exactly as
+          provided. Do not reinterpret, normalise, correct, or substitute
+          the predicate with another relationship.
+          The permitted predicates are defined in the DefinedPredicates enum.
+          If the supplied predicate is not permitted, return the original
+          predicate unchanged so that it can be rejected during validation.
+          Return only the predicate value. Do not provide explanations,
+          notes, warnings, suggested corrections, or alternative predicates.
+        range: DefinedPredicates
+        required: true
+
+      object:
+        description: >-
+          The object of the triple. This is the entity, concept, date, or
+          literal value associated with the subject through the predicate.
+          Return the extracted value as text. Do not combine multiple entities
+          into a single object. Create a separate triple for each distinct
+          object associated with the same subject and predicate.
+        range: string
+        required: true

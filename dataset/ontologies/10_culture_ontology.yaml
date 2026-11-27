@@ -1,0 +1,135 @@
+id: https://w3id.org/ontogpt/culture
+name: culture
+title: Culture Ontology
+description: >-
+  A schema for extracting culture-related information as subject-predicate-object
+  triples. The triple predicates use the Wikidata properties defined in the
+  original culture ontology.
+license: https://creativecommons.org/publicdomain/zero/1.0/
+
+prefixes:
+  linkml: https://w3id.org/linkml/
+  culture: https://w3id.org/ontogpt/culture/
+  wd: http://www.wikidata.org/entity/
+  wdt: http://www.wikidata.org/prop/direct/
+
+default_prefix: culture
+default_range: string
+
+imports:
+  - linkml:types
+  - core
+
+enums:
+  DefinedPredicates:
+    description: >-
+      The only permitted relationship predicates for culture knowledge graph
+      extraction. These values are a complete and exclusive set of allowed predicates. Only take predicates from these permissible values,
+      and do not invent or use a synonym for these predicates. Use the exact spelling that this list of predicates define.
+    permissible_values:
+      ethnic_group:
+        description: The ethnic group to which the person belongs. The subject must be an instance of the class human. The object must be an instance of the class ethnic group.
+        meaning: wdt:P172
+
+      religious_order:
+        description: The religious order associated with the subject religion. The subject must be an instance of the class religion. The object must be an instance of the class religion.
+        meaning: wdt:P611
+
+      languages_spoken_written_or_signed:
+        description: A language spoken, written or signed by the person. The subject must be an instance of the class human. The object must be an instance of the class language.
+        meaning: wdt:P1412
+
+      inception:
+        description: The date on which the literary work originated. The subject must be an instance of the class literature.
+        meaning: wdt:P571
+
+      start_time:
+        description: The date or time when the festival began. The subject must be an instance of the class festival.
+        meaning: wdt:P580
+
+      dedicated_to:
+        description: The person to whom the artwork is dedicated. The subject must be an instance of the class art. The object must be an instance of the class human.
+        meaning: wdt:P825
+
+      iconographic_symbol:
+        description: An iconographic symbol associated with the person. The subject must be an instance of the class human.
+        meaning: wdt:P4185
+
+      indigenous_to:
+        description: The place or region to which the dance is indigenous. The subject must be an instance of the class dance.
+        meaning: wdt:P2341
+
+classes:
+  KnowledgeGraph:
+    tree_root: true
+    description: >-
+      The root extraction object. Contains a collection of subject-predicate-
+      object triples describing culture-related entities and facts.
+    attributes:
+      triples:
+        range: Triple
+        multivalued: true
+        description: >-
+            Extract every relationship explicitly mentioned in the input text that can be represented using the permitted ontology predicates.
+            The only permitted predicates and their definitions are:
+
+            ethnic_group: The ethnic group to which the person belongs. The subject must be an instance of the class human. The object must be an instance of the class ethnic group.
+            religious_order: The religious order associated with the subject religion. The subject must be an instance of the class religion. The object must be an instance of the class religion.
+            languages_spoken_written_or_signed: A language spoken, written or signed by the person. The subject must be an instance of the class human. The object must be an instance of the class language.
+            inception: The date on which the literary work originated. The subject must be an instance of the class literature.
+            start_time: The date or time when the festival began. The subject must be an instance of the class festival.
+            dedicated_to: The person to whom the artwork is dedicated. The subject must be an instance of the class art. The object must be an instance of the class human.
+            iconographic_symbol: An iconographic symbol associated with the person. The subject must be an instance of the class human.
+            indigenous_to: The place or region to which the dance is indigenous. The subject must be an instance of the class dance.
+
+            Select predicates according to their definitions. Use the exact spelling of the permitted predicate names. Do not
+            invent predicates or use alternative predicate names. Do not include relationships that cannot be represented using the permitted
+            predicates.
+
+            Each triple must contain exactly one subject, one predicate, and one object, in that order. Within each triple, separate the subject, predicate,
+            and object using commas. Separate distinct triples using semicolons.
+            
+            Extract a separate triple for each distinct object associated with the same subject and predicate.
+
+            Do not invent entities, relationships, or values that are not supported by the input text.
+
+  Triple:
+    description: >-
+      A single subject-predicate-object statement extracted from the input text.
+      The subject identifies the entity being described, the predicate identifies
+      the relationship or property, and the object provides the related entity
+      or literal value. Each triple must be in the format of subject, predicate, object, where each item is separated by commas.
+    attributes:
+      subject:
+        description: >-
+          The subject of the triple. Preserve the subject supplied
+          in the input triple exactly as provided. Do not replace,
+          reinterpret, infer, expand, or resolve the subject using
+          external knowledge. Do not introduce an entity name that
+          is absent from the supplied input triple.
+        range: string
+        required: true
+
+      predicate:
+        description: >-
+          The relationship or property connecting the subject and object.
+          Preserve the predicate supplied in the input triple exactly as
+          provided. Do not reinterpret, normalise, correct, or substitute
+          the predicate with another relationship.
+          The permitted predicates are defined in the DefinedPredicates enum.
+          If the supplied predicate is not permitted, return the original
+          predicate unchanged so that it can be rejected during validation.
+          Return only the predicate value. Do not provide explanations,
+          notes, warnings, suggested corrections, or alternative predicates.
+        range: DefinedPredicates
+        required: true
+
+      object:
+        description: >-
+          The object of the triple. This is the entity, concept, date, or
+          literal value associated with the subject through the predicate.
+          Return the extracted value as text. Do not combine multiple entities
+          into a single object. Create a separate triple for each distinct
+          object associated with the same subject and predicate.
+        range: string
+        required: true

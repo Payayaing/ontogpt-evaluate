@@ -1,0 +1,140 @@
+id: https://w3id.org/ontogpt/politics
+name: politics
+title: Politics Ontology
+description: >-
+  A schema for extracting politics-related information as subject-predicate-object
+  triples. The triple predicates use the Wikidata properties defined in the
+  original politics ontology.
+license: https://creativecommons.org/publicdomain/zero/1.0/
+
+prefixes:
+  linkml: https://w3id.org/linkml/
+  politics: https://w3id.org/ontogpt/politics/
+  wd: http://www.wikidata.org/entity/
+  wdt: http://www.wikidata.org/prop/direct/
+
+default_prefix: politics
+default_range: string
+
+imports:
+  - linkml:types
+  - core
+
+enums:
+  DefinedPredicates:
+    description: >-
+      The only permitted relationship predicates for politics knowledge graph
+      extraction. These values are a complete and exclusive set of allowed predicates. Only take predicates from these permissible values,
+      and do not invent or use a synonym for these predicates. Use the exact spelling that this list of predicates define.
+    permissible_values:
+      head_of_state:
+        description: The person serving as head of state of the country. The subject must be an instance of the class country. The object must be an instance of the class human.
+        meaning: wdt:P35
+
+      head_of_government:
+        description: The person serving as head of government of the country. The subject must be an instance of the class country. The object must be an instance of the class human.
+        meaning: wdt:P6
+
+      position_held:
+        description: The position held by the person. The subject must be an instance of the class human. The object must be an instance of the class president.
+        meaning: wdt:P39
+
+      member_of:
+        description: The organisation of which the person is a member. The subject must be an instance of the class human. The object must be an instance of the class organization.
+        meaning: wdt:P463
+
+      political_alignment:
+        description: The political alignment of the political party. The subject must be an instance of the class political party. The object must be an instance of the class political alignment.
+        meaning: wdt:P1387
+
+      member_of_political_party:
+        description: The political party of which the person is a member. The subject must be an instance of the class human. The object must be an instance of the class political party.
+        meaning: wdt:P102
+
+      elected_in:
+        description: The election in which the person was elected. The subject must be an instance of the class human. The object must be an instance of the class public election.
+        meaning: wdt:P2715
+
+      candidacy_in_election:
+        description: The election in which the person was a candidate. The subject must be an instance of the class human. The object must be an instance of the class public election.
+        meaning: wdt:P3602
+
+      political_ideology:
+        description: The political ideology of the political party. The subject must be an instance of the class political party. The object must be an instance of the class political ideology.
+        meaning: wdt:P1142
+
+classes:
+  KnowledgeGraph:
+    tree_root: true
+    description: >-
+      The root extraction object. Contains a collection of subject-predicate-
+      object triples describing politics-related entities and facts.
+    attributes:
+      triples:
+        range: Triple
+        multivalued: true
+        description: >-
+            Extract every relationship explicitly mentioned in the input text that can be represented using the permitted ontology predicates.
+            The only permitted predicates and their definitions are:
+
+            head_of_state: The person serving as head of state of the country. The subject must be an instance of the class country. The object must be an instance of the class human.
+            head_of_government: The person serving as head of government of the country. The subject must be an instance of the class country. The object must be an instance of the class human.
+            position_held: The position held by the person. The subject must be an instance of the class human. The object must be an instance of the class president.
+            member_of: The organisation of which the person is a member. The subject must be an instance of the class human. The object must be an instance of the class organization.
+            political_alignment: The political alignment of the political party. The subject must be an instance of the class political party. The object must be an instance of the class political alignment.
+            member_of_political_party: The political party of which the person is a member. The subject must be an instance of the class human. The object must be an instance of the class political party.
+            elected_in: The election in which the person was elected. The subject must be an instance of the class human. The object must be an instance of the class public election.
+            candidacy_in_election: The election in which the person was a candidate. The subject must be an instance of the class human. The object must be an instance of the class public election.
+            political_ideology: The political ideology of the political party. The subject must be an instance of the class political party. The object must be an instance of the class political ideology.
+
+            Select predicates according to their definitions. Use the exact spelling of the permitted predicate names. Do not
+            invent predicates or use alternative predicate names. Do not include relationships that cannot be represented using the permitted
+            predicates.
+
+            Each triple must contain exactly one subject, one predicate, and one object, in that order. Within each triple, separate the subject, predicate,
+            and object using commas. Separate distinct triples using semicolons.
+            
+            Extract a separate triple for each distinct object associated with the same subject and predicate.
+
+            Do not invent entities, relationships, or values that are not supported by the input text.
+
+  Triple:
+    description: >-
+      A single subject-predicate-object statement extracted from the input text.
+      The subject identifies the entity being described, the predicate identifies
+      the relationship or property, and the object provides the related entity
+      or literal value. Each triple must be in the format of subject, predicate, object, where each item is separated by commas.
+    attributes:
+      subject:
+        description: >-
+          The subject of the triple. Preserve the subject supplied
+          in the input triple exactly as provided. Do not replace,
+          reinterpret, infer, expand, or resolve the subject using
+          external knowledge. Do not introduce an entity name that
+          is absent from the supplied input triple.
+        range: string
+        required: true
+
+      predicate:
+        description: >-
+          The relationship or property connecting the subject and object.
+          Preserve the predicate supplied in the input triple exactly as
+          provided. Do not reinterpret, normalise, correct, or substitute
+          the predicate with another relationship.
+          The permitted predicates are defined in the DefinedPredicates enum.
+          If the supplied predicate is not permitted, return the original
+          predicate unchanged so that it can be rejected during validation.
+          Return only the predicate value. Do not provide explanations,
+          notes, warnings, suggested corrections, or alternative predicates.
+        range: DefinedPredicates
+        required: true
+
+      object:
+        description: >-
+          The object of the triple. This is the entity, concept, date, or
+          literal value associated with the subject through the predicate.
+          Return the extracted value as text. Do not combine multiple entities
+          into a single object. Create a separate triple for each distinct
+          object associated with the same subject and predicate.
+        range: string
+        required: true

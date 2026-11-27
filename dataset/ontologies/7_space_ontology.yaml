@@ -1,0 +1,130 @@
+id: https://w3id.org/ontogpt/space
+name: space
+title: Space Ontology
+description: >-
+  A schema for extracting space-related information as subject-predicate-object
+  triples. The triple predicates use the Wikidata properties defined in the
+  original space ontology.
+license: https://creativecommons.org/publicdomain/zero/1.0/
+
+prefixes:
+  linkml: https://w3id.org/linkml/
+  space: https://w3id.org/ontogpt/space/
+  wd: http://www.wikidata.org/entity/
+  wdt: http://www.wikidata.org/prop/direct/
+
+default_prefix: space
+default_range: string
+
+imports:
+  - linkml:types
+  - core
+
+enums:
+  DefinedPredicates:
+    description: >-
+      The only permitted relationship predicates for space knowledge graph
+      extraction. These values are a complete and exclusive set of allowed predicates. Only take predicates from these permissible values,
+      and do not invent or use a synonym for these predicates. Use the exact spelling that this list of predicates define.
+    permissible_values:
+      site_of_astronomical_discovery:
+        description: The observatory at which the asteroid was discovered. The subject must be an instance of the class asteroid. The object must be an instance of the class observatory.
+        meaning: wdt:P65
+
+      minor_planet_group:
+        description: The minor planet group to which the asteroid belongs. The subject must be an instance of the class asteroid. The object must be an instance of the class astronomical object type.
+        meaning: wdt:P196
+
+      constellation:
+        description: The constellation in which the spiral galaxy is located. The subject must be an instance of the class spiral galaxy. The object must be an instance of the class constellation.
+        meaning: wdt:P59
+
+      astronaut_mission:
+        description: The spaceflight mission in which the person participated. The subject must be an instance of the class human. The object must be an instance of the class spaceflight.
+        meaning: wdt:P450
+
+      spacecraft_docking_undocking_date:
+        description: The date on which the spacecraft docked or undocked. The subject must be an instance of the class spacecraft.
+        meaning: wdt:P622
+
+      backup_or_reserve_team_or_crew:
+        description: A person who served as a backup or reserve crew member of the spaceflight. The subject must be an instance of the class spaceflight. The object must be an instance of the class human.
+        meaning: wdt:P3015
+
+      location_of_landing:
+        description: The geographical location where the spacecraft landed. The subject must be an instance of the class spacecraft. The object must be an instance of the class geographic region.
+        meaning: wdt:P1158
+
+classes:
+  KnowledgeGraph:
+    tree_root: true
+    description: >-
+      The root extraction object. Contains a collection of subject-predicate-
+      object triples describing space-related entities and facts.
+    attributes:
+      triples:
+        range: Triple
+        multivalued: true
+        description: >-
+            Extract every relationship explicitly mentioned in the input text that can be represented using the permitted ontology predicates.
+            The only permitted predicates and their definitions are:
+
+            site_of_astronomical_discovery: The observatory at which the asteroid was discovered. The subject must be an instance of the class asteroid. The object must be an instance of the class observatory.
+            minor_planet_group: The minor planet group to which the asteroid belongs. The subject must be an instance of the class asteroid. The object must be an instance of the class astronomical object type.
+            constellation: The constellation in which the spiral galaxy is located. The subject must be an instance of the class spiral galaxy. The object must be an instance of the class constellation.
+            astronaut_mission: The spaceflight mission in which the person participated. The subject must be an instance of the class human. The object must be an instance of the class spaceflight.
+            spacecraft_docking_undocking_date: The date on which the spacecraft docked or undocked. The subject must be an instance of the class spacecraft.
+            backup_or_reserve_team_or_crew: A person who served as a backup or reserve crew member of the spaceflight. The subject must be an instance of the class spaceflight. The object must be an instance of the class human.
+            location_of_landing: The geographical location where the spacecraft landed. The subject must be an instance of the class spacecraft. The object must be an instance of the class geographic region.
+
+            Select predicates according to their definitions. Use the exact spelling of the permitted predicate names. Do not
+            invent predicates or use alternative predicate names. Do not include relationships that cannot be represented using the permitted
+            predicates.
+
+            Each triple must contain exactly one subject, one predicate, and one object, in that order. Within each triple, separate the subject, predicate,
+            and object using commas. Separate distinct triples using semicolons.
+            
+            Extract a separate triple for each distinct object associated with the same subject and predicate.
+
+            Do not invent entities, relationships, or values that are not supported by the input text.
+
+  Triple:
+    description: >-
+      A single subject-predicate-object statement extracted from the input text.
+      The subject identifies the entity being described, the predicate identifies
+      the relationship or property, and the object provides the related entity
+      or literal value. Each triple must be in the format of subject, predicate, object, where each item is separated by commas.
+    attributes:
+      subject:
+        description: >-
+          The subject of the triple. Preserve the subject supplied
+          in the input triple exactly as provided. Do not replace,
+          reinterpret, infer, expand, or resolve the subject using
+          external knowledge. Do not introduce an entity name that
+          is absent from the supplied input triple.
+        range: string
+        required: true
+
+      predicate:
+        description: >-
+          The relationship or property connecting the subject and object.
+          Preserve the predicate supplied in the input triple exactly as
+          provided. Do not reinterpret, normalise, correct, or substitute
+          the predicate with another relationship.
+          The permitted predicates are defined in the DefinedPredicates enum.
+          If the supplied predicate is not permitted, return the original
+          predicate unchanged so that it can be rejected during validation.
+          Return only the predicate value. Do not provide explanations,
+          notes, warnings, suggested corrections, or alternative predicates.
+        range: DefinedPredicates
+        required: true
+
+      object:
+        description: >-
+          The object of the triple. This is the entity, concept, date, or
+          literal value associated with the subject through the predicate.
+          Return the extracted value as text. Do not combine multiple entities
+          into a single object. Create a separate triple for each distinct
+          object associated with the same subject and predicate.
+        range: string
+        required: true

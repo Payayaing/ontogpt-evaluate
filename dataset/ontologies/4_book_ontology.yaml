@@ -1,0 +1,155 @@
+id: https://w3id.org/ontogpt/book
+name: book
+title: Book Ontology
+description: >-
+  A schema for extracting book-related information as subject-predicate-object
+  triples. The triple predicates use the Wikidata properties defined in the
+  original book ontology.
+license: https://creativecommons.org/publicdomain/zero/1.0/
+
+prefixes:
+  linkml: https://w3id.org/linkml/
+  book: https://w3id.org/ontogpt/book/
+  wd: http://www.wikidata.org/entity/
+  wdt: http://www.wikidata.org/prop/direct/
+
+default_prefix: book
+default_range: string
+
+imports:
+  - linkml:types
+  - core
+
+enums:
+  DefinedPredicates:
+    description: >-
+      The only permitted relationship predicates for book knowledge graph
+      extraction. These values are a complete and exclusive set of allowed predicates. Only take predicates from these permissible values,
+      and do not invent or use a synonym for these predicates. Use the exact spelling that this list of predicates define.
+    permissible_values:
+      illustrator:
+        description: The person who illustrated the work. The subject must be an entity of class Q47461344 (class label not specified in the source ontology). The object must be an instance of the class human.
+        meaning: wdt:P110
+
+      followed_by:
+        description: The work that follows the subject work. The subject must be an entity of class Q47461344 (class label not specified in the source ontology). The object must be an entity of class Q47461344 (class label not specified in the source ontology).
+        meaning: wdt:P156
+
+      publication_date:
+        description: The publication or release date of the book, including a year used to describe the book. The subject must be an instance of the class book.
+        meaning: wdt:P577
+
+      author:
+        description: The author of the book. The subject must be an instance of the class book. The object must be an instance of the class human.
+        meaning: wdt:P50
+
+      publisher:
+        description: The publisher of the book. The subject must be an instance of the class book. The object must be an instance of the class publisher.
+        meaning: wdt:P123
+
+      characters:
+        description: Fictional characters appearing in the literary work. The subject must be an instance of the class literary work. The object must be an instance of the class fictional character.
+        meaning: wdt:P674
+
+      editor:
+        description: The editor of the trade magazine. The subject must be an instance of the class trade magazine. The object must be an instance of the class human.
+        meaning: wdt:P98
+
+      place_of_publication:
+        description: The place where the work was published. The subject must be an entity of class Q47461344 (class label not specified in the source ontology). The object must be an entity of class Q82794 (class label not specified in the source ontology).
+        meaning: wdt:P291
+
+      narrative_location:
+        description: The location in which the literary work's narrative is set. The subject must be an instance of the class literary work. The object must be an instance of the class territory.
+        meaning: wdt:P840
+
+      genre:
+        description: The genre, category, or type of the literary work. The subject must be an instance of the class literary work. The object must be an instance of the class literary genre.
+        meaning: wdt:P136
+
+      language_of_work_or_name:
+        description: The language of the work or its name. The subject must be an instance of the class literary work. The object must be an instance of the class language.
+        meaning: wdt:P407
+
+      depicts:
+        description: The entity or subject depicted by the work. The subject must be an entity of class Q47461344 (class label not specified in the source ontology).
+        meaning: wdt:P180
+
+classes:
+  KnowledgeGraph:
+    tree_root: true
+    description: >-
+      The root extraction object. Contains a collection of subject-predicate-
+      object triples describing book-related entities and facts.
+    attributes:
+      triples:
+        range: Triple
+        multivalued: true
+        description: >-
+            Extract every relationship explicitly mentioned in the input text that can be represented using the permitted ontology predicates.
+            The only permitted predicates and their definitions are:
+
+            illustrator: The person who illustrated the work. The subject must be an entity of class Q47461344 (class label not specified in the source ontology). The object must be an instance of the class human.
+            followed_by: The work that follows the subject work. The subject must be an entity of class Q47461344 (class label not specified in the source ontology). The object must be an entity of class Q47461344 (class label not specified in the source ontology).
+            publication_date: The publication or release date of the book, including a year used to describe the book. The subject must be an instance of the class book.
+            author: The author of the book. The subject must be an instance of the class book. The object must be an instance of the class human.
+            publisher: The publisher of the book. The subject must be an instance of the class book. The object must be an instance of the class publisher.
+            characters: Fictional characters appearing in the literary work. The subject must be an instance of the class literary work. The object must be an instance of the class fictional character.
+            editor: The editor of the trade magazine. The subject must be an instance of the class trade magazine. The object must be an instance of the class human.
+            place_of_publication: The place where the work was published. The subject must be an entity of class Q47461344 (class label not specified in the source ontology). The object must be an entity of class Q82794 (class label not specified in the source ontology).
+            narrative_location: The location in which the literary work's narrative is set. The subject must be an instance of the class literary work. The object must be an instance of the class territory.
+            genre: The genre, category, or type of the literary work. The subject must be an instance of the class literary work. The object must be an instance of the class literary genre.
+            language_of_work_or_name: The language of the work or its name. The subject must be an instance of the class literary work. The object must be an instance of the class language.
+            depicts: The entity or subject depicted by the work. The subject must be an entity of class Q47461344 (class label not specified in the source ontology).
+
+            Select predicates according to their definitions. Use the exact spelling of the permitted predicate names. Do not
+            invent predicates or use alternative predicate names. Do not include relationships that cannot be represented using the permitted
+            predicates.
+
+            Each triple must contain exactly one subject, one predicate, and one object, in that order. Within each triple, separate the subject, predicate,
+            and object using commas. Separate distinct triples using semicolons.
+            
+            Extract a separate triple for each distinct object associated with the same subject and predicate.
+
+            Do not invent entities, relationships, or values that are not supported by the input text.
+
+  Triple:
+    description: >-
+      A single subject-predicate-object statement extracted from the input text.
+      The subject identifies the entity being described, the predicate identifies
+      the relationship or property, and the object provides the related entity
+      or literal value. Each triple must be in the format of subject, predicate, object, where each item is separated by commas.
+    attributes:
+      subject:
+        description: >-
+          The subject of the triple. Preserve the subject supplied
+          in the input triple exactly as provided. Do not replace,
+          reinterpret, infer, expand, or resolve the subject using
+          external knowledge. Do not introduce an entity name that
+          is absent from the supplied input triple.
+        range: string
+        required: true
+
+      predicate:
+        description: >-
+          The relationship or property connecting the subject and object.
+          Preserve the predicate supplied in the input triple exactly as
+          provided. Do not reinterpret, normalise, correct, or substitute
+          the predicate with another relationship.
+          The permitted predicates are defined in the DefinedPredicates enum.
+          If the supplied predicate is not permitted, return the original
+          predicate unchanged so that it can be rejected during validation.
+          Return only the predicate value. Do not provide explanations,
+          notes, warnings, suggested corrections, or alternative predicates.
+        range: DefinedPredicates
+        required: true
+
+      object:
+        description: >-
+          The object of the triple. This is the entity, concept, date, or
+          literal value associated with the subject through the predicate.
+          Return the extracted value as text. Do not combine multiple entities
+          into a single object. Create a separate triple for each distinct
+          object associated with the same subject and predicate.
+        range: string
+        required: true

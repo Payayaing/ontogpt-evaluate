@@ -1,0 +1,160 @@
+id: https://w3id.org/ontogpt/music
+name: music
+title: Music Ontology
+description: >-
+  A schema for extracting music-related information as subject-predicate-object
+  triples. The triple predicates use the Wikidata properties defined in the
+  original music ontology.
+license: https://creativecommons.org/publicdomain/zero/1.0/
+
+prefixes:
+  linkml: https://w3id.org/linkml/
+  music: https://w3id.org/ontogpt/music/
+  wd: http://www.wikidata.org/entity/
+  wdt: http://www.wikidata.org/prop/direct/
+
+default_prefix: music
+default_range: string
+
+imports:
+  - linkml:types
+  - core
+
+enums:
+  DefinedPredicates:
+    description: >-
+      The only permitted relationship predicates for music knowledge graph
+      extraction. These values are a complete and exclusive set of allowed predicates. Only take predicates from these permissible values,
+      and do not invent or use a synonym for these predicates. Use the exact spelling that this list of predicates define.
+    permissible_values:
+      composer:
+        description: The composer of the musical work. The subject must be an instance of the class musical work. The object must be an instance of the class human.
+        meaning: wdt:P86
+
+      part_of:
+        description: The album of which the musical work is a part. The subject must be an instance of the class musical work. The object must be an instance of the class album.
+        meaning: wdt:P361
+
+      lyrics_by:
+        description: The person who wrote the lyrics of the musical work. The subject must be an instance of the class musical work. The object must be an instance of the class human.
+        meaning: wdt:P676
+
+      publication_date:
+        description: The publication or release date of the musical work, including a year used to describe the musical work. The subject must be an instance of the class musical work.
+        meaning: wdt:P577
+
+      language_of_work_or_name:
+        description: The language of the work or its name. The subject must be an instance of the class musical work. The object must be an instance of the class language.
+        meaning: wdt:P407
+
+      voice_type:
+        description: The voice type of the person. The subject must be an instance of the class human. The object must be an instance of the class voice.
+        meaning: wdt:P412
+
+      instrumentation:
+        description: The instruments used in the musical work. The subject must be an instance of the class musical work.
+        meaning: wdt:P870
+
+      tracklist:
+        description: A musical work included in the tracklist of the album. The subject must be an instance of the class album. The object must be an instance of the class musical work.
+        meaning: wdt:P658
+
+      genre:
+        description: The genre, category, or type of the musical work. The subject must be an instance of the class musical work. The object must be an instance of the class music genre.
+        meaning: wdt:P136
+
+      performer:
+        description: The performer of the musical work. The subject must be an instance of the class musical work.
+        meaning: wdt:P175
+
+      producer:
+        description: The producer of the album. The subject must be an instance of the class album.
+        meaning: wdt:P162
+
+      nominated_for:
+        description: An award for which the album was nominated. The subject must be an instance of the class album. The object must be an instance of the class award.
+        meaning: wdt:P1411
+
+      record_label:
+        description: The record label associated with the album. The subject must be an instance of the class album.
+        meaning: wdt:P264
+
+classes:
+  KnowledgeGraph:
+    tree_root: true
+    description: >-
+      The root extraction object. Contains a collection of subject-predicate-
+      object triples describing music-related entities and facts.
+    attributes:
+      triples:
+        range: Triple
+        multivalued: true
+        description: >-
+            Extract every relationship explicitly mentioned in the input text that can be represented using the permitted ontology predicates.
+            The only permitted predicates and their definitions are:
+
+            composer: The composer of the musical work. The subject must be an instance of the class musical work. The object must be an instance of the class human.
+            part_of: The album of which the musical work is a part. The subject must be an instance of the class musical work. The object must be an instance of the class album.
+            lyrics_by: The person who wrote the lyrics of the musical work. The subject must be an instance of the class musical work. The object must be an instance of the class human.
+            publication_date: The publication or release date of the musical work, including a year used to describe the musical work. The subject must be an instance of the class musical work.
+            language_of_work_or_name: The language of the work or its name. The subject must be an instance of the class musical work. The object must be an instance of the class language.
+            voice_type: The voice type of the person. The subject must be an instance of the class human. The object must be an instance of the class voice.
+            instrumentation: The instruments used in the musical work. The subject must be an instance of the class musical work.
+            tracklist: A musical work included in the tracklist of the album. The subject must be an instance of the class album. The object must be an instance of the class musical work.
+            genre: The genre, category, or type of the musical work. The subject must be an instance of the class musical work. The object must be an instance of the class music genre.
+            performer: The performer of the musical work. The subject must be an instance of the class musical work.
+            producer: The producer of the album. The subject must be an instance of the class album.
+            nominated_for: An award for which the album was nominated. The subject must be an instance of the class album. The object must be an instance of the class award.
+            record_label: The record label associated with the album. The subject must be an instance of the class album.
+
+            Select predicates according to their definitions. Use the exact spelling of the permitted predicate names. Do not
+            invent predicates or use alternative predicate names. Do not include relationships that cannot be represented using the permitted
+            predicates.
+
+            Each triple must contain exactly one subject, one predicate, and one object, in that order. Within each triple, separate the subject, predicate,
+            and object using commas. Separate distinct triples using semicolons.
+            
+            Extract a separate triple for each distinct object associated with the same subject and predicate.
+
+            Do not invent entities, relationships, or values that are not supported by the input text.
+
+  Triple:
+    description: >-
+      A single subject-predicate-object statement extracted from the input text.
+      The subject identifies the entity being described, the predicate identifies
+      the relationship or property, and the object provides the related entity
+      or literal value. Each triple must be in the format of subject, predicate, object, where each item is separated by commas.
+    attributes:
+      subject:
+        description: >-
+          The subject of the triple. Preserve the subject supplied
+          in the input triple exactly as provided. Do not replace,
+          reinterpret, infer, expand, or resolve the subject using
+          external knowledge. Do not introduce an entity name that
+          is absent from the supplied input triple.
+        range: string
+        required: true
+
+      predicate:
+        description: >-
+          The relationship or property connecting the subject and object.
+          Preserve the predicate supplied in the input triple exactly as
+          provided. Do not reinterpret, normalise, correct, or substitute
+          the predicate with another relationship.
+          The permitted predicates are defined in the DefinedPredicates enum.
+          If the supplied predicate is not permitted, return the original
+          predicate unchanged so that it can be rejected during validation.
+          Return only the predicate value. Do not provide explanations,
+          notes, warnings, suggested corrections, or alternative predicates.
+        range: DefinedPredicates
+        required: true
+
+      object:
+        description: >-
+          The object of the triple. This is the entity, concept, date, or
+          literal value associated with the subject through the predicate.
+          Return the extracted value as text. Do not combine multiple entities
+          into a single object. Create a separate triple for each distinct
+          object associated with the same subject and predicate.
+        range: string
+        required: true
